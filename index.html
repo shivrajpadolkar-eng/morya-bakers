@@ -128,6 +128,12 @@ footer{
   cursor:pointer;
   font-weight:600;
 }
+#message{
+  text-align:center;
+  margin-top:15px;
+  font-weight:bold;
+  color:green;
+}
 @media(max-width:768px){
   header h1{font-size:2.2rem;}
   .about{grid-template-columns:1fr;}
@@ -203,7 +209,7 @@ footer{
 
 <section id="order">
   <h2>Place Your Order</h2>
-  <form id="order-form" action="order.php" method="POST">
+  <form id="order-form" method="POST">
     <label>Name:</label>
     <input type="text" name="name" required>
 
@@ -217,13 +223,14 @@ footer{
     <textarea name="orderDetails" id="orderDetails" readonly required></textarea>
 
     <button type="submit">Place Order</button>
+    <p id="message"></p>
   </form>
 </section>
 
 <section id="contact" class="contact">
   <h2>Contact Us</h2>
-  <p>📍 Address: Your Bakery Address</p>
-  <p>📞 Phone: 9XXXXXXXXX</p>
+  <p>📍 Address: vasud road karmveer nagar road no 7 sangola</p>
+  <p>📞 Phone: 9503493276</p>
   <p>📧 Email: moryabakers@gmail.com</p>
 </section>
 
@@ -231,6 +238,7 @@ footer{
   <p>© 2025 Morya Bakers | Designed with ❤️</p>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script>
 let cart = [];
 
@@ -259,63 +267,26 @@ document.querySelectorAll('.add-to-cart').forEach(btn => {
     alert(`${name} added to cart!`);
   });
 });
+
+// Ajax order submission
+$('#order-form').submit(function(e){
+  e.preventDefault();
+  $.ajax({
+    url:'order_backend.php', // create this PHP file on server
+    method:'POST',
+    data: $(this).serialize(),
+    success:function(response){
+      $('#message').html(response);
+      $('#order-form')[0].reset();
+      cart = [];
+      updateOrderForm();
+    },
+    error:function(){
+      $('#message').html('Something went wrong. Try again.');
+    }
+  });
+});
 </script>
 
 </body>
 </html>
-<?php
-if($_SERVER["REQUEST_METHOD"] == "POST"){
-    $name = $_POST['name'];
-    $phone = $_POST['phone'];
-    $address = $_POST['address'];
-    $orderDetails = $_POST['orderDetails'];
-
-    $to = "moryabakers@gmail.com"; // Your email
-    $subject = "New Order from $name";
-    $message = "Name: $name\nPhone: $phone\nAddress: $address\n\nOrder Details:\n$orderDetails";
-
-    $headers = "From: no-reply@moryabakers.com";
-
-    if(mail($to,$subject,$message,$headers)){
-        echo "<h2>Thank you $name! Your order has been received.</h2>";
-        echo "<a href='index.html'>Back to Home</a>";
-    } else {
-        echo "<h2>Sorry! Something went wrong. Try again.</h2>";
-    }
-}
-?>
-<?php
-use PHPMailer\PHPMailer\PHPMailer;
-require 'PHPMailer/src/PHPMailer.php';
-require 'PHPMailer/src/SMTP.php';
-
-if($_SERVER["REQUEST_METHOD"] == "POST"){
-    $name = $_POST['name'];
-    $phone = $_POST['phone'];
-    $address = $_POST['address'];
-    $orderDetails = $_POST['orderDetails'];
-
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com'; // your SMTP server
-        $mail->SMTPAuth = true;
-        $mail->Username = 'your-email@gmail.com'; // your email
-        $mail->Password = 'your-email-password';
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
-
-        $mail->setFrom('your-email@gmail.com', 'Morya Bakers');
-        $mail->addAddress('moryabakers@gmail.com');
-
-        $mail->Subject = "New Order from $name";
-        $mail->Body    = "Name: $name\nPhone: $phone\nAddress: $address\n\nOrder Details:\n$orderDetails";
-
-        $mail->send();
-        echo "<h2>Thank you $name! Your order has been received.</h2>";
-        echo "<a href='index.html'>Back to Home</a>";
-    } catch (Exception $e) {
-        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-    }
-}
-?>
