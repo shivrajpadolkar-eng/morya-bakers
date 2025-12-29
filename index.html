@@ -284,3 +284,38 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
 }
 ?>
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
+
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    $name = $_POST['name'];
+    $phone = $_POST['phone'];
+    $address = $_POST['address'];
+    $orderDetails = $_POST['orderDetails'];
+
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com'; // your SMTP server
+        $mail->SMTPAuth = true;
+        $mail->Username = 'your-email@gmail.com'; // your email
+        $mail->Password = 'your-email-password';
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = 587;
+
+        $mail->setFrom('your-email@gmail.com', 'Morya Bakers');
+        $mail->addAddress('moryabakers@gmail.com');
+
+        $mail->Subject = "New Order from $name";
+        $mail->Body    = "Name: $name\nPhone: $phone\nAddress: $address\n\nOrder Details:\n$orderDetails";
+
+        $mail->send();
+        echo "<h2>Thank you $name! Your order has been received.</h2>";
+        echo "<a href='index.html'>Back to Home</a>";
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
+}
+?>
