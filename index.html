@@ -263,3 +263,24 @@ document.querySelectorAll('.add-to-cart').forEach(btn => {
 
 </body>
 </html>
+<?php
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    $name = $_POST['name'];
+    $phone = $_POST['phone'];
+    $address = $_POST['address'];
+    $orderDetails = $_POST['orderDetails'];
+
+    $to = "moryabakers@gmail.com"; // Your email
+    $subject = "New Order from $name";
+    $message = "Name: $name\nPhone: $phone\nAddress: $address\n\nOrder Details:\n$orderDetails";
+
+    $headers = "From: no-reply@moryabakers.com";
+
+    if(mail($to,$subject,$message,$headers)){
+        echo "<h2>Thank you $name! Your order has been received.</h2>";
+        echo "<a href='index.html'>Back to Home</a>";
+    } else {
+        echo "<h2>Sorry! Something went wrong. Try again.</h2>";
+    }
+}
+?>
