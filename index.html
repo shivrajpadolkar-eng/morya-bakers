@@ -39,6 +39,7 @@ header p{font-size:1.2rem;margin:15px 0;}
   text-decoration:none;
   border-radius:30px;
   font-weight:600;
+  cursor:pointer;
 }
 nav{
   background:var(--dark);
@@ -77,6 +78,7 @@ h2{text-align:center;font-size:2.3rem;margin-bottom:40px;color:var(--dark);}
   box-shadow:0 5px 15px rgba(0,0,0,.1);
   overflow:hidden;
   text-align:center;
+  padding-bottom:15px;
 }
 .card img{
   width:100%;
@@ -91,6 +93,14 @@ h2{text-align:center;font-size:2.3rem;margin-bottom:40px;color:var(--dark);}
   font-weight:600;
   color:var(--primary);
 }
+.add-to-cart{
+  background:var(--primary);
+  color:white;
+  padding:10px 20px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+}
 .contact{
   background:var(--gray);
   text-align:center;
@@ -101,6 +111,22 @@ footer{
   color:white;
   text-align:center;
   padding:20px;
+}
+#order textarea,#order input{
+  width:100%;
+  padding:10px;
+  margin-bottom:15px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+#order button{
+  background:var(--primary);
+  color:white;
+  padding:12px 25px;
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+  font-weight:600;
 }
 @media(max-width:768px){
   header h1{font-size:2.2rem;}
@@ -115,6 +141,7 @@ footer{
   <a href="#home">Home</a>
   <a href="#about">About</a>
   <a href="#menu">Menu</a>
+  <a href="#order">Order</a>
   <a href="#contact">Contact</a>
 </nav>
 
@@ -152,6 +179,7 @@ footer{
       <h3>Chocolate Truffle</h3>
       <p>Rich & creamy chocolate delight</p>
       <span>₹500 / kg</span>
+      <button class="add-to-cart" data-name="Chocolate Truffle" data-price="500">Add to Cart</button>
     </div>
 
     <div class="card">
@@ -159,6 +187,7 @@ footer{
       <h3>Vanilla Cream</h3>
       <p>Classic soft vanilla cake</p>
       <span>₹450 / kg</span>
+      <button class="add-to-cart" data-name="Vanilla Cream" data-price="450">Add to Cart</button>
     </div>
 
     <div class="card">
@@ -166,21 +195,71 @@ footer{
       <h3>Strawberry Cake</h3>
       <p>Fresh strawberry flavor</p>
       <span>₹550 / kg</span>
+      <button class="add-to-cart" data-name="Strawberry Cake" data-price="550">Add to Cart</button>
     </div>
 
   </div>
 </section>
 
+<section id="order">
+  <h2>Place Your Order</h2>
+  <form id="order-form" action="order.php" method="POST">
+    <label>Name:</label>
+    <input type="text" name="name" required>
+
+    <label>Phone:</label>
+    <input type="text" name="phone" required>
+
+    <label>Address:</label>
+    <textarea name="address" required></textarea>
+
+    <label>Your Order:</label>
+    <textarea name="orderDetails" id="orderDetails" readonly required></textarea>
+
+    <button type="submit">Place Order</button>
+  </form>
+</section>
+
 <section id="contact" class="contact">
   <h2>Contact Us</h2>
-  <p>📍 Address:  vasud road karmveer nagar road no 7 sangola</p>
-  <p>📞 Phone: 9503493276</p>
+  <p>📍 Address: Your Bakery Address</p>
+  <p>📞 Phone: 9XXXXXXXXX</p>
   <p>📧 Email: moryabakers@gmail.com</p>
 </section>
 
 <footer>
   <p>© 2025 Morya Bakers | Designed with ❤️</p>
 </footer>
+
+<script>
+let cart = [];
+
+function updateOrderForm() {
+  if(cart.length === 0){
+    document.getElementById('orderDetails').value = "";
+    return;
+  }
+  let orderText = "";
+  cart.forEach(item => {
+    orderText += `${item.name} x ${item.quantity} = ₹${item.price*item.quantity}\n`;
+  });
+  let total = cart.reduce((sum, item) => sum + item.price*item.quantity, 0);
+  orderText += `Total: ₹${total}`;
+  document.getElementById('orderDetails').value = orderText;
+}
+
+document.querySelectorAll('.add-to-cart').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const name = btn.dataset.name;
+    const price = parseInt(btn.dataset.price);
+    const existing = cart.find(item => item.name === name);
+    if (existing) existing.quantity += 1;
+    else cart.push({name, price, quantity:1});
+    updateOrderForm();
+    alert(`${name} added to cart!`);
+  });
+});
+</script>
 
 </body>
 </html>
